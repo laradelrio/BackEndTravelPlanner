@@ -3,7 +3,7 @@
 const yup = require('yup');
 
 const registerUser = yup.object().shape({
-    username: yup.string().required(),
+    name: yup.string().required(),
     email: yup.string().email().required(),
     password: yup.string().required(),
     passwordConfirmation: yup.string()
