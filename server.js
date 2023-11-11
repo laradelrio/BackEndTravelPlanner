@@ -42,11 +42,10 @@ db.sequelize.sync()
         console.log("Failed to sync db: " + err.message);
     });
 
-// drop existing tables and re-sync database - only for development
-
-db.sequelize.sync({ force: true }).then(() => {
-    console.log("Drop and re-sync db.");
-});
+// DROP EXISTING TABLES AND RE-SYNC DATABASE - ONLY FOR DEVELOPMENT
+// db.sequelize.sync({ force: true }).then(() => {
+//     console.log("Drop and re-sync db.");
+// });
 
 
 //Routes
