@@ -109,7 +109,7 @@ exports.findOne = async (req, res) => {
 
 };
 
-// Update a User by the id in the request
+// Update a User field by the id in the request
 exports.update = async (req, res) => {
     let userId = req.params.id;
     let updatedField = req.body.field;
