@@ -59,6 +59,18 @@ exports.findOrCreate = async (req, res) => {
 // Retrieve all Users from the database.
 exports.findAll = (req, res) => {
 
+    Users.findAll()
+        .then(data => {
+            if (data === null) {
+                res.status(404).send({ success: false, message: 'No Users Found' });
+            } else {
+                res.status(200).send({ success: true, message: 'Users Found Successfully', data: data });
+            }
+        })
+        .catch(err => {
+            res.status(500).send({ success: false, message: err.message || 'Error retrieving Users' });
+        })
+
 };
 
 //find single User by id
@@ -69,7 +81,7 @@ exports.findByPk = (req, res) => {
     Users.findByPk(id, { attributes: ['id', 'name', 'email', 'photo'] })
         .then(data => {
             if (data === null) {
-                res.status(404).send({ success: false, message: 'User Not Found', data: data });
+                res.status(404).send({ success: false, message: 'User Not Found'});
             } else {
                 res.status(200).send({ success: true, message: 'User Found Successfully by ID', data: data });
             }
@@ -86,7 +98,7 @@ exports.findOne = async (req, res) => {
     Users.findOne({ where: { email: req.body.email } }, { attributes: ['id', 'name', 'email', 'photo'] })
         .then(data => {
             if (data === null) {
-                res.status(404).send({ success: false, message: 'User Not Found', data: data });
+                res.status(404).send({ success: false, message: 'User Not Found'});
             } else {
                 res.status(200).send({ success: true, message: 'User Found Successfully by Email', data: data });
             }
@@ -94,6 +106,7 @@ exports.findOne = async (req, res) => {
         .catch(err => {
             res.status(500).send({ success: false, message: err.message || 'Error retrieving User' });
         })
+        
 };
 
 // Update a User by the id in the request

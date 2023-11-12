@@ -6,15 +6,18 @@ const usersDto = require('../validators/dto/user')
 const registerUser = require('../validators/dto/user');
 
 
-router.get('/', (req, res) => res.send('This is root!'));
+// router.get('/', (req, res) => res.send('This is root!'));
 
 //GET
+//get all users
+router.get('/' , controllers.findAll);
 
 //get user by email
 router.get('/byEmail', controllers.findOne);
 
 //get user by id
 router.get('/:id' , controllers.findByPk);
+
 
 
 //POST
