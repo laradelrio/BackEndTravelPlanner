@@ -115,7 +115,7 @@ exports.update = async (req, res) => {
     let updatedField = req.body.field;
     let updatedValue = req.body.value;
 
-    if(updatedField === "password"){
+    if (updatedField === "password") {
         updatedValue = await bcryptjs.hash(updatedValue, 8);
     }
 
@@ -125,10 +125,10 @@ exports.update = async (req, res) => {
         },
     })
         .then(data => {
-            if (data === 0  ) {
+            if (data === 0) {
                 res.status(404).send({ success: false, message: 'User Not Found' });
             } else {
-                res.status(200).send({ success: true, message: 'User updated successfully', data: data });
+                res.status(200).send({ success: true, message: 'User updated successfully' });
             }
         })
         .catch(err => {
@@ -137,7 +137,23 @@ exports.update = async (req, res) => {
 };
 
 // Delete a User with the specified id in the request
-exports.delete = (req, res) => {
+exports.delete = async (req, res) => {
+    let userId = req.params.id;
+    await Users.destroy({
+        where: {
+            id: userId,
+        },
+    })
+    .then(data => {
+        if (data === 0) {
+            res.status(404).send({ success: false, message: 'User Not Found' });
+        } else {
+            res.status(200).send({ success: true, message: 'User deleted successfully' });
+        }
+    })
+    .catch(err => {
+        res.status(500).send({ success: false, message: err.message || 'Error Deleting User' });
+    })
 
 };
 

@@ -23,8 +23,11 @@ router.get('/:id' , controllers.findByPk);
 //POST
 router.post('/', validateDto(registerUser), controllers.findOrCreate);
 
-//POST
+//PUT
 router.put('/update/:id', controllers.update);
+
+//DELETE
+router.delete('/delete/:id', controllers.delete);
 
 /* CREATE user without checking for registered email:
     router.post('/', validateDto(registerUser), controllers.create); */
