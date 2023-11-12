@@ -31,7 +31,7 @@ exports.create = async (req, res) => {
 exports.findOrCreate = async (req, res) => {
 
     let hashedPassword = await bcryptjs.hash(req.body.password, 8);
-    
+
     Users.findOrCreate({
         where: { email: req.body.email },
         defaults: {
@@ -41,19 +41,19 @@ exports.findOrCreate = async (req, res) => {
             photo: req.body.photo,
         }
     })
-    .then((result) => {
-        let user = result[0];
-        let created = result[1];
+        .then((result) => {
+            let user = result[0];
+            let created = result[1];
 
-        if (!created) {
-            res.status(409).send({ success: created, message: 'Email already registered' });
-        } else {
-            res.status(201).send({ success: true, message: 'User created Successfully' });
-        }
-    })
-    .catch(err => {
-        res.status(500).send({ success: false, message: err.message || 'Error creating User' });
-    })
+            if (!created) {
+                res.status(409).send({ success: created, message: 'Email already registered' });
+            } else {
+                res.status(201).send({ success: true, message: 'User created Successfully' });
+            }
+        })
+        .catch(err => {
+            res.status(500).send({ success: false, message: err.message || 'Error creating User' });
+        })
 }
 
 // Retrieve all Users from the database.
@@ -81,7 +81,7 @@ exports.findByPk = (req, res) => {
     Users.findByPk(id, { attributes: ['id', 'name', 'email', 'photo'] })
         .then(data => {
             if (data === null) {
-                res.status(404).send({ success: false, message: 'User Not Found'});
+                res.status(404).send({ success: false, message: 'User Not Found' });
             } else {
                 res.status(200).send({ success: true, message: 'User Found Successfully by ID', data: data });
             }
@@ -98,7 +98,7 @@ exports.findOne = async (req, res) => {
     Users.findOne({ where: { email: req.body.email } }, { attributes: ['id', 'name', 'email', 'photo'] })
         .then(data => {
             if (data === null) {
-                res.status(404).send({ success: false, message: 'User Not Found'});
+                res.status(404).send({ success: false, message: 'User Not Found' });
             } else {
                 res.status(200).send({ success: true, message: 'User Found Successfully by Email', data: data });
             }
@@ -106,12 +106,34 @@ exports.findOne = async (req, res) => {
         .catch(err => {
             res.status(500).send({ success: false, message: err.message || 'Error retrieving User' });
         })
-        
+
 };
 
 // Update a User by the id in the request
-exports.update = (req, res) => {
+exports.update = async (req, res) => {
+    let userId = req.params.id;
+    let updatedField = req.body.field;
+    let updatedValue = req.body.value;
 
+    if(updatedField === "password"){
+        updatedValue = await bcryptjs.hash(updatedValue, 8);
+    }
+
+    await Users.update({ [updatedField]: updatedValue }, {
+        where: {
+            id: userId,
+        },
+    })
+        .then(data => {
+            if (data === 0  ) {
+                res.status(404).send({ success: false, message: 'User Not Found' });
+            } else {
+                res.status(200).send({ success: true, message: 'User updated successfully', data: data });
+            }
+        })
+        .catch(err => {
+            res.status(500).send({ success: false, message: err.message || 'Error Updating User' });
+        })
 };
 
 // Delete a User with the specified id in the request
