@@ -3,6 +3,7 @@ const Users = db.Users;
 const Op = db.Sequelize.Op;
 const Sequelize = require("sequelize");
 const bcryptjs = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 // Create and Save a NEW User WITHOUT CHECKING IF THEIR EMAIL IS ALREADY REGISTERED
 exports.create = async (req, res) => {
@@ -100,7 +101,11 @@ exports.findOne = async (req, res) => {
             if (data === null) {
                 res.status(404).send({ success: false, message: 'User Not Found' });
             } else {
-                res.status(200).send({ success: true, message: 'User Found Successfully by Email', data: data });
+                const token = jwt.sign({
+                    id_user: data.id,
+                }, process.env.TOKEN_SECRET)
+
+                res.status(200).send({ success: true, message: 'User Found Successfully by Email', data: token });
             }
         })
         .catch(err => {
