@@ -4,6 +4,7 @@ const Op = db.Sequelize.Op;
 const Sequelize = require("sequelize");
 const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const dotenv = require('dotenv');
 
 // Create and Save a NEW User WITHOUT CHECKING IF THEIR EMAIL IS ALREADY REGISTERED
 exports.create = async (req, res) => {
@@ -103,9 +104,9 @@ exports.findOne = async (req, res) => {
             } else {
                 const token = jwt.sign({
                     id_user: data.id,
-                }, process.env.TOKEN_SECRET)
+                }, process.env.TOKEN_SECRET, { expiresIn: '15min' })
 
-                res.status(200).send({ success: true, message: 'User Found Successfully by Email', data: token });
+                res.status(200).send({ success: true, message: 'User Found Successfully by Email', data: { token: token } });
             }
         })
         .catch(err => {
@@ -113,6 +114,26 @@ exports.findOne = async (req, res) => {
         })
 
 };
+
+// Validate Token.
+exports.validateToken = (req, res) => {
+    let token = req.body.token;
+
+    if (token === null) {
+        res.status(401).send({ success: false, message: 'Access Denied' });
+    } else {
+        let secretJWT = process.env.TOKEN_SECRET;
+        const verified = jwt.verify(token, secretJWT, (err, decoded) => {
+            if(err){
+                res.status(500).send({ success: false, message: 'Access Denied', data: err });
+            }else{
+                res.status(200).send({ status: true, message: "JWT verified" });
+            }
+        });
+    }
+};
+
+
 
 // Update a User field by the id in the request
 exports.update = async (req, res) => {
@@ -149,16 +170,16 @@ exports.delete = async (req, res) => {
             id: userId,
         },
     })
-    .then(data => {
-        if (data === 0) {
-            res.status(404).send({ success: false, message: 'User Not Found' });
-        } else {
-            res.status(200).send({ success: true, message: 'User deleted successfully' });
-        }
-    })
-    .catch(err => {
-        res.status(500).send({ success: false, message: err.message || 'Error Deleting User' });
-    })
+        .then(data => {
+            if (data === 0) {
+                res.status(404).send({ success: false, message: 'User Not Found' });
+            } else {
+                res.status(200).send({ success: true, message: 'User deleted successfully' });
+            }
+        })
+        .catch(err => {
+            res.status(500).send({ success: false, message: err.message || 'Error Deleting User' });
+        })
 
 };
 

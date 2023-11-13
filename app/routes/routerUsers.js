@@ -23,6 +23,8 @@ router.get('/:id' , controllers.findByPk);
 //POST
 router.post('/', validateDto(registerUser), controllers.findOrCreate);
 
+router.post('/token', controllers.validateToken);
+
 //PUT
 router.put('/update/:id', controllers.update);
 
