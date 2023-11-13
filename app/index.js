@@ -23,5 +23,6 @@ db.sequelize = sequelize;
 
 // require model of db users table
 db.Users = require("./models/users.model.js")(sequelize, Sequelize);
-
+db.Trips = require("./models/trips.model.js")(sequelize, Sequelize);
+db.Sights = require("./models/sights.model.js")(sequelize, Sequelize);
 module.exports = db;

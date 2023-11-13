@@ -3,7 +3,6 @@ const yup = require('yup');
 
 const registerSight = yup.object().shape({
     name: yup.string().required(),
-    destination: yup.string().required(),
     longitude: yup.number().required(), 
     latitude: yup.number().required(),
     startDate: yup.date().required(),
@@ -13,4 +12,4 @@ const registerSight = yup.object().shape({
 
 
 
-module.exports = {registerTrip};
+module.exports = {registerSight};
