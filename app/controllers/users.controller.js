@@ -97,16 +97,23 @@ exports.findByPk = (req, res) => {
 // Find a single User by email
 exports.findOne = async (req, res) => {
 
-    Users.findOne({ where: { email: req.body.email } }, { attributes: ['id', 'name', 'email', 'photo'] })
-        .then(data => {
+    Users.findOne({ where: { email: req.body.email } }, { attributes: ['id', 'password'] })
+        .then(async data => {
             if (data === null) {
                 res.status(404).send({ success: false, message: 'User Not Found' });
             } else {
-                const token = jwt.sign({
-                    id_user: data.id,
-                }, process.env.TOKEN_SECRET, { expiresIn: '15min' })
 
-                res.status(200).send({ success: true, message: 'User Found Successfully by Email', data: { token: token } });
+                let isPasswordValid = await bcryptjs.compare(req.body.password, data.password);
+
+                if (!isPasswordValid) {
+                    res.status(401).send({ success: false, message: 'Invalid Password' });
+                } else {
+                    const token = jwt.sign({
+                        id_user: data.id,
+                    }, process.env.TOKEN_SECRET, { expiresIn: '15min' })
+
+                    res.status(200).send({ success: true, message: 'User Found Successfully by Email', data: { token: token } });
+                }
             }
         })
         .catch(err => {
@@ -124,9 +131,9 @@ exports.validateToken = (req, res) => {
     } else {
         let secretJWT = process.env.TOKEN_SECRET;
         const verified = jwt.verify(token, secretJWT, (err, decoded) => {
-            if(err){
+            if (err) {
                 res.status(500).send({ success: false, message: 'Access Denied', data: err });
-            }else{
+            } else {
                 res.status(200).send({ status: true, message: "JWT verified" });
             }
         });

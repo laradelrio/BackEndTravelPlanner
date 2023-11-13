@@ -2,8 +2,9 @@ const express = require('express');
 const controllers = require('../controllers/users.controller');
 const router = express.Router();
 const validateDto = require('../validators/middleware/validate-dto');
-const usersDto = require('../validators/dto/user')
-const registerUser = require('../validators/dto/user');
+const usersDto = require('../validators/dto/user');
+
+
 
 
 // router.get('/', (req, res) => res.send('This is root!'));
@@ -13,15 +14,14 @@ const registerUser = require('../validators/dto/user');
 router.get('/' , controllers.findAll);
 
 //get user by email
-router.get('/byEmail', controllers.findOne);
+router.get('/byEmail',validateDto(usersDto.loginUser),  controllers.findOne);
 
 //get user by id
 router.get('/:id' , controllers.findByPk);
 
 
-
 //POST
-router.post('/', validateDto(registerUser), controllers.findOrCreate);
+router.post('/', validateDto(usersDto.registerUser), controllers.findOrCreate);
 
 router.post('/token', controllers.validateToken);
 

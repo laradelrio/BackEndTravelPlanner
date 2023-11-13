@@ -1,5 +1,4 @@
 //requirements for our request body
-
 const yup = require('yup');
 
 const registerUser = yup.object().shape({
@@ -12,9 +11,8 @@ const registerUser = yup.object().shape({
 })
 
 const loginUser = yup.object().shape({
-    username: yup.string().required(),
     email: yup.string().email().required(),
     password: yup.string().required(),
 })
 
-module.exports = registerUser, loginUser;
+module.exports = {registerUser, loginUser};
