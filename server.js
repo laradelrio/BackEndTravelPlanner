@@ -51,8 +51,10 @@ db.sequelize.sync()
 //Routes
 const usersRoute = require('./app/routes/routerUsers.js');
 const tripsRoute = require('./app/routes/routerTrips.js');
+const sightsRoute = require('./app/routes/routerSights.js');
 
 app.use('/api/users', usersRoute);
 app.use('/api/trips', tripsRoute);
+app.use('/api/sights', sightsRoute);
 
 
