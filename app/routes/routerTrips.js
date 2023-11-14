@@ -12,7 +12,10 @@ const tripsDto = require('../validators/dto/trip');
 router.get('/' , controllers.findAllTrips);
 
 //get all trips
-router.get('/:id' , controllers.findAllTripsByUser);
+router.get('/user/:id' , controllers.findAllTripsByUser);
+
+//get all trips
+router.get('/:id', controllers.findOneTrip)
 
 //POST
 router.post('/', validateDto(tripsDto.registerTrip), controllers.createTrip);

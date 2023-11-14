@@ -63,4 +63,21 @@ exports.findAllTripsByUser = (req, res) => {
 };
 
 
+// Retrieve all Trips by USER from the database.
+exports.findOneTrip = (req, res) => {
+
+    Trips.findOne({ where: { id: req.params.id } })
+        .then(data => {
+            if (data === null) {
+                res.status(404).send({ success: false, message: 'No Trips Found' });
+            } else {
+                res.status(200).send({ success: true, message: 'Trips Found Successfully', data: data });
+            }
+        })
+        .catch(err => {
+            res.status(500).send({ success: false, message: err.message || 'Error retrieving Trips' });
+        })
+
+};
+
 
