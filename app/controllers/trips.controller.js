@@ -28,12 +28,29 @@ exports.createTrip = async (req, res) => {
         })
 }
 
-// Retrieve all Users from the database.
+// Retrieve all Trips from the database.
 exports.findAllTrips = (req, res) => {
 
     Trips.findAll()
         .then(data => {
             if (data === null) {
+                res.status(404).send({ success: false, message: 'No Trips Found' });
+            } else {
+                res.status(200).send({ success: true, message: 'Trips Found Successfully', data: data });
+            }
+        })
+        .catch(err => {
+            res.status(500).send({ success: false, message: err.message || 'Error retrieving Trips' });
+        })
+
+};
+
+// Retrieve all Trips by USER from the database.
+exports.findAllTripsByUser = (req, res) => {
+
+    Trips.findAll({ where: { fk_users_id: req.params.id } })
+        .then(data => {
+            if (data.length === 0) {
                 res.status(404).send({ success: false, message: 'No Trips Found' });
             } else {
                 res.status(200).send({ success: true, message: 'Trips Found Successfully', data: data });
