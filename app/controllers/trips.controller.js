@@ -80,4 +80,26 @@ exports.findOneTrip = (req, res) => {
 
 };
 
+//update Event
+exports.updateTrip = async (req, res) => {
+    let eventId = req.params.id;
+    let updatedField = req.body.field;
+    let updatedValue = req.body.value;
+
+    await Trips.update({ [updatedField]: updatedValue }, {
+        where: {
+            id: eventId,
+        },
+    })
+        .then(data => {
+            if (data[0] === 0) {
+                res.status(404).send({ success: false, message: 'Trip Not Found' });
+            } else {
+                res.status(200).send({ success: true, message: 'Trip updated successfully' });
+            }
+        })
+        .catch(err => {
+            res.status(500).send({ success: false, message: err.message || 'Error Updating Trip' });
+        })
+};
 

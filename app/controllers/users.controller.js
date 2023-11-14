@@ -158,7 +158,7 @@ exports.update = async (req, res) => {
         },
     })
         .then(data => {
-            if (data === 0) {
+            if (data[0] === 0) {
                 res.status(404).send({ success: false, message: 'User Not Found' });
             } else {
                 res.status(200).send({ success: true, message: 'User updated successfully' });
