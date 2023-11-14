@@ -63,7 +63,7 @@ exports.findAllTripsByUser = (req, res) => {
 };
 
 
-// Retrieve all Trips by USER from the database.
+// Retrieve One trip by ID.
 exports.findOneTrip = (req, res) => {
 
     Trips.findOne({ where: { id: req.params.id } })
@@ -80,7 +80,7 @@ exports.findOneTrip = (req, res) => {
 
 };
 
-//update Event
+//update Trip
 exports.updateTrip = async (req, res) => {
     let eventId = req.params.id;
     let updatedField = req.body.field;
