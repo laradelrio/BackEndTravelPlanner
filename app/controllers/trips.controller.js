@@ -7,7 +7,6 @@ const dotenv = require('dotenv');
 // Create and Save a NEW Trip
 exports.createTrip = async (req, res) => {
 
-    console.log(req.body.user)
     //Create User
     const trip = {
         name: req.body.name,
