@@ -11,5 +11,6 @@ router.get('/', (req, res) => res.send('This is root sights!'));
 //POST
 router.post('/', validateDto(sightsDto.registerSight), controllers.createSight);
 
+router.put('/update/:id', controllers.updateSight);
 
 module.exports = router;

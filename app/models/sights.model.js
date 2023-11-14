@@ -5,7 +5,7 @@ module.exports = (sequelize, Sequelize) => {
         },
         fk_trips_id: {
             type: Sequelize.INTEGER,
-            references: {         // User belongsTo Company 1:1
+            references: {    
                 model: 'trips',
                 key: 'id'
             }
