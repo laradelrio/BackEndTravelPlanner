@@ -103,3 +103,23 @@ exports.updateTrip = async (req, res) => {
         })
 };
 
+//delete Trip by ID
+exports.deleteTrip = async (req, res) => {
+    let tripId = req.params.id;
+    await Trips.destroy({
+        where: {
+            id: tripId,
+        },
+    })
+        .then(data => {
+            if (data === 0) {
+                res.status(404).send({ success: false, message: 'Trip Not Found' });
+            } else {
+                res.status(200).send({ success: true, message: 'Trip deleted successfully' });
+            }
+        })
+        .catch(err => {
+            res.status(500).send({ success: false, message: err.message || 'Error Deleting Trip' });
+        })
+
+};

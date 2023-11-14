@@ -26,6 +26,9 @@ router.post('/', validateDto(tripsDto.registerTrip), controllers.createTrip);
 //PUT 
 router.put('/update/:id', controllers.updateTrip);
 
+//DELETE
+router.delete('/delete/:id', controllers.deleteTrip);
+
 /* CREATE user without checking for registered email:
     router.post('/', validateDto(registerUser), controllers.create); */
 
