@@ -63,3 +63,23 @@ exports.updateSight = async (req, res) => {
             res.status(500).send({ success: false, message: err.message || 'Error Updating Sight' });
         })
 };
+
+exports.deleteSight = async (req, res) => {
+    let sightId = req.params.id;
+    await Sights.destroy({
+        where: {
+            id: sightId,
+        },
+    })
+        .then(data => {
+            if (data === 0) {
+                res.status(404).send({ success: false, message: 'Sight Not Found' });
+            } else {
+                res.status(200).send({ success: true, message: 'Sight deleted successfully' });
+            }
+        })
+        .catch(err => {
+            res.status(500).send({ success: false, message: err.message || 'Error Deleting Sight' });
+        })
+
+};

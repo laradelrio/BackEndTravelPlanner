@@ -6,13 +6,13 @@ const sightsDto = require('../validators/dto/sight');
 
 
 
-router.get('/', (req, res) => res.send('This is root sights!'));
 
-//get all trips by one user
 router.get('/trip/:id', controllers.findAllSightsByTrip);
-//POST
+
 router.post('/', validateDto(sightsDto.registerSight), controllers.createSight);
 
 router.put('/update/:id', controllers.updateSight);
+
+router.delete('/delete/:id', controllers.deleteSight);
 
 module.exports = router;
