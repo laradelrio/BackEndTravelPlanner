@@ -122,7 +122,7 @@ exports.findOne = async (req, res) => {
                         path: '/', // cookie is valid for the entire website
                     });
                     res.setHeader('Set-Cookie', serialized); 
-                    res.status(200).send({ success: true, message: 'User Found Successfully by Email', data: { token: token } });
+                    res.status(200).send({ success: true, message: 'User Found Successfully by Email'});
                     }
             }
             })
