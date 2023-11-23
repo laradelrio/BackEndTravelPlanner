@@ -5,6 +5,7 @@ const Sequelize = require("sequelize");
 const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
+const cookie = require('cookie');
 
 // Create and Save a NEW User WITHOUT CHECKING IF THEIR EMAIL IS ALREADY REGISTERED
 exports.create = async (req, res) => {
@@ -112,10 +113,19 @@ exports.findOne = async (req, res) => {
                         id_user: data.id,
                     }, process.env.TOKEN_SECRET, { expiresIn: '15min' })
 
+
+                    const serialized = cookie.serialize('token', token, {
+                        httpOnly: true,
+                        secure: process.env.NODE_ENV === 'production',
+                        sameSite: 'strict', //prevents the cookie from being sent with cross-site requests
+                        maxAge: 60 * 60 * 24 * 30,  // sets the maximum age of the cookie in seconds. here: 30 days
+                        path: '/', // cookie is valid for the entire website
+                    });
+                    res.setHeader('Set-Cookie', serialized); 
                     res.status(200).send({ success: true, message: 'User Found Successfully by Email', data: { token: token } });
-                }
+                    }
             }
-        })
+            })
         .catch(err => {
             res.status(500).send({ success: false, message: err.message || 'Error retrieving User' });
         })

@@ -14,7 +14,7 @@ const usersDto = require('../validators/dto/user');
 router.get('/' , controllers.findAll);
 
 //get user by email
-router.get('/byEmail',validateDto(usersDto.loginUser),  controllers.findOne);
+router.post('/byEmail',validateDto(usersDto.loginUser),  controllers.findOne);
 
 //get user by id
 router.get('/:id' , controllers.findByPk);
