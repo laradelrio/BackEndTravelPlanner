@@ -25,6 +25,8 @@ router.post('/', validateDto(usersDto.registerUser), controllers.findOrCreate);
 
 router.post('/token', controllers.validateToken);
 
+router.post('/logout', controllers.logOut);
+
 //PUT
 router.put('/update/:id', controllers.update);
 

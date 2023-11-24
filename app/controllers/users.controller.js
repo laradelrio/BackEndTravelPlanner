@@ -7,6 +7,7 @@ const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 const cookie = require('cookie');
 
+
 // Create and Save a NEW User WITHOUT CHECKING IF THEIR EMAIL IS ALREADY REGISTERED
 exports.create = async (req, res) => {
 
@@ -148,6 +149,24 @@ exports.validateToken = (req, res) => {
             }
         });
     }
+};
+
+// logout
+exports.logOut = (req, res) => {
+
+    const  token = req.cookies.token;
+
+    const serialized = cookie.serialize('token', null, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: -1,
+        path: '/',
+    });
+
+    res.setHeader('Set-Cookie', serialized);
+    res.status(200).send({ status: true, message: "Logged out" });
+
 };
 
 
