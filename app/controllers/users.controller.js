@@ -135,17 +135,18 @@ exports.findOne = async (req, res) => {
 
 // Validate Token.
 exports.validateToken = (req, res) => {
-    let token = req.body.token;
+
+    const  token = req.cookies.token;
 
     if (token === null) {
-        res.status(401).send({ success: false, message: 'Access Denied' });
+        res.status(401).send({ success: false, message: 'Unauthorized' });
     } else {
         let secretJWT = process.env.TOKEN_SECRET;
         const verified = jwt.verify(token, secretJWT, (err, decoded) => {
             if (err) {
-                res.status(500).send({ success: false, message: 'Access Denied', data: err });
+                res.status(500).send({ success: false, message: 'Unauthorized'});
             } else {
-                res.status(200).send({ status: true, message: "JWT verified" });
+                res.status(200).send({ status: true, message: "Authorized" });
             }
         });
     }
@@ -168,8 +169,6 @@ exports.logOut = (req, res) => {
     res.status(200).send({ status: true, message: "Logged out" });
 
 };
-
-
 
 // Update a User field by the id in the request
 exports.update = async (req, res) => {
