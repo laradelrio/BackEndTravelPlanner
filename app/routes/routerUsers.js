@@ -14,24 +14,24 @@ const usersDto = require('../validators/dto/user');
 router.get('/' , controllers.findAll);
 
 //get user by email
-router.post('/byEmail',validateDto(usersDto.loginUser),  controllers.findOne);
+router.post('/byEmail', validateDto(usersDto.loginUser),  controllers.findOne);
 
 //get user by id
-router.get('/:id' , controllers.findByPk);
+router.get('/:id', validateDto(null), controllers.findByPk);
 
 
 //POST
 router.post('/', validateDto(usersDto.registerUser), controllers.findOrCreate);
 
-router.post('/token', controllers.validateToken);
+router.post('/token', validateDto(null), controllers.validateToken);
 
-router.post('/logout', controllers.logOut);
+router.post('/logout', validateDto(null), controllers.logOut);
 
 //PUT
-router.put('/update/:id', controllers.update);
+router.put('/update/:id', validateDto(null), controllers.update);
 
 //DELETE
-router.delete('/delete/:id', controllers.delete);
+router.delete('/delete/:id', validateDto(null), controllers.delete);
 
 /* CREATE user without checking for registered email:
     router.post('/', validateDto(registerUser), controllers.create); */

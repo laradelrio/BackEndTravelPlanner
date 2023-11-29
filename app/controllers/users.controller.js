@@ -3,9 +3,7 @@ const Users = db.Users;
 const Op = db.Sequelize.Op;
 const Sequelize = require("sequelize");
 const bcryptjs = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const dotenv = require('dotenv');
-const cookie = require('cookie');
+const tokenFunc = require('../helperFunctions/tokenFunctions');
 
 
 // Create and Save a NEW User WITHOUT CHECKING IF THEIR EMAIL IS ALREADY REGISTERED
@@ -96,7 +94,7 @@ exports.findByPk = (req, res) => {
 
 };
 
-// Find a single User by email
+// login user - by email and password and return token
 exports.findOne = async (req, res) => {
 
     Users.findOne({ where: { email: req.body.email } }, { attributes: ['id', 'password'] })
@@ -110,64 +108,26 @@ exports.findOne = async (req, res) => {
                 if (!isPasswordValid) {
                     res.status(401).send({ success: false, message: 'Invalid Password' });
                 } else {
-                    const token = jwt.sign({
-                        id_user: data.id,
-                    }, process.env.TOKEN_SECRET, { expiresIn: '15min' })
-
-
-                    const serialized = cookie.serialize('token', token, {
-                        httpOnly: true,
-                        secure: process.env.NODE_ENV === 'production',
-                        sameSite: 'strict', //prevents the cookie from being sent with cross-site requests
-                        maxAge: 60 * 60 * 24 * 30,  // sets the maximum age of the cookie in seconds. here: 30 days
-                        path: '/', // cookie is valid for the entire website
-                    });
-                    res.setHeader('Set-Cookie', serialized); 
-                    res.status(200).send({ success: true, message: 'User Found Successfully by Email'});
-                    }
+                    tokenFunc.createToken(data.id, res);
+                    res.status(200).send({ success: true, message: 'User Found Successfully by Email' });
+                }
             }
-            })
+        })
         .catch(err => {
             res.status(500).send({ success: false, message: err.message || 'Error retrieving User' });
         })
 
 };
 
-// Validate Token.
+// Valid token message
 exports.validateToken = (req, res) => {
-
-    const  token = req.cookies.token;
-
-    if (token === null) {
-        res.status(401).send({ success: false, message: 'Unauthorized' });
-    } else {
-        let secretJWT = process.env.TOKEN_SECRET;
-        const verified = jwt.verify(token, secretJWT, (err, decoded) => {
-            if (err) {
-                res.status(500).send({ success: false, message: 'Unauthorized'});
-            } else {
-                res.status(200).send({ status: true, message: "Authorized" });
-            }
-        });
-    }
+    res.status(200).send({ status: true, message: "Authorized" });
 };
 
 // logout
 exports.logOut = (req, res) => {
-
-    const  token = req.cookies.token;
-
-    const serialized = cookie.serialize('token', null, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        maxAge: -1,
-        path: '/',
-    });
-
-    res.setHeader('Set-Cookie', serialized);
+    tokenFunc.logout(res);
     res.status(200).send({ status: true, message: "Logged out" });
-
 };
 
 // Update a User field by the id in the request

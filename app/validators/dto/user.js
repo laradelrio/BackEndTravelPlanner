@@ -15,4 +15,4 @@ const loginUser = yup.object().shape({
     password: yup.string().required(),
 })
 
-module.exports = {registerUser, loginUser};
+module.exports = { registerUser, loginUser };
