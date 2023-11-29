@@ -1,10 +1,10 @@
 const tokenFunc = require('../../helperFunctions/tokenFunctions');
 
-function validateDto(schema) {
+function validateUserAuth() {
     return async (req, res, next) => {
         try {
-            await schema.validate(req.body);
-            console.log('validatingDTO')
+            tokenFunc.validateToken(req, res);
+            console.log("validate user DTO");
             next();
         } catch (err) {
             res.status(404).send({ success: false, message: 'Invalid Request Body' });
@@ -12,4 +12,4 @@ function validateDto(schema) {
     }
 }
 
-module.exports = validateDto;
+module.exports = { validateUserAuth };
