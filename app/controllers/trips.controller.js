@@ -44,11 +44,11 @@ exports.findAllTrips = (req, res) => {
 
 // Retrieve all Trips by USER from the database.
 exports.findAllTripsByUser = (req, res) => {
-
+    
     Trips.findAll({ where: { fk_users_id: req.params.id } })
         .then(data => {
             if (data.length === 0) {
-                res.status(404).send({ success: false, message: 'No Trips Found' });
+                res.status(204).send({ success: false, message: 'No Trips Found' });
             } else {
                 res.status(200).send({ success: true, message: 'Trips Found Successfully', data: data });
             }

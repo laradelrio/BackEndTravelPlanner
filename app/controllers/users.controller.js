@@ -77,7 +77,7 @@ exports.findAll = (req, res) => {
 
 //find single User by id
 exports.findByPk = (req, res) => {
-
+    
     const id = req.params.id;
 
     Users.findByPk(id, { attributes: ['id', 'name', 'email', 'photo'] })
@@ -109,7 +109,7 @@ exports.findOne = async (req, res) => {
                     res.status(401).send({ success: false, message: 'Invalid Password' });
                 } else {
                     tokenFunc.createToken(data.id, res);
-                    res.status(200).send({ success: true, message: 'User Found Successfully by Email' });
+                    res.status(200).send({ success: true, message: 'User Found Successfully by Email', data: { id: data.id, }});
                 }
             }
         })
@@ -139,7 +139,7 @@ exports.update = async (req, res) => {
     if (updatedField === "password") {
         updatedValue = await bcryptjs.hash(updatedValue, 8);
     }
-
+   
     await Users.update({ [updatedField]: updatedValue }, {
         where: {
             id: userId,
@@ -147,7 +147,7 @@ exports.update = async (req, res) => {
     })
         .then(data => {
             if (data[0] === 0) {
-                res.status(404).send({ success: false, message: 'User Not Found' });
+                res.status(204).send({ success: false, message: 'User Not Found' });
             } else {
                 res.status(200).send({ success: true, message: 'User updated successfully' });
             }

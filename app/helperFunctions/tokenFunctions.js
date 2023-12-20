@@ -28,8 +28,6 @@ function checkTokenExpiry(token, userId, res) {
     let expiryMin = (decoded.exp) / 60;
     let minNow = (new Date().getTime() / 1000) / 60;
     let minTillExpires = expiryMin - minNow;
-    
-    console.log(minTillExpires);
 
     if (minTillExpires < 15) {
         return createToken(userId, res)

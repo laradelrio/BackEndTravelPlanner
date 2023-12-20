@@ -20,7 +20,6 @@ router.post('/byEmail', validateDto(usersDto.loginUser),  controllers.findOne);
 //get user by id
 router.get('/:id', validateUserAuth.validateUserAuth(), controllers.findByPk);
 
-
 //POST
 router.post('/', validateDto(usersDto.registerUser), controllers.findOrCreate);
 
