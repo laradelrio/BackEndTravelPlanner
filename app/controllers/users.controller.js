@@ -135,7 +135,6 @@ exports.update = async (req, res) => {
     let userId = req.params.id;
     let updatedField = req.body.field;
     let updatedValue = req.body.value;
-    console.log('updating')
 
     if (updatedField === "password") {
         updatedValue = await bcryptjs.hash(updatedValue, 8);
@@ -149,7 +148,7 @@ exports.update = async (req, res) => {
             return;
         }
     }
-   
+    
     await Users.update({ [updatedField]: updatedValue }, {
         where: {
             id: userId,
