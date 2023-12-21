@@ -135,9 +135,19 @@ exports.update = async (req, res) => {
     let userId = req.params.id;
     let updatedField = req.body.field;
     let updatedValue = req.body.value;
+    console.log('updating')
 
     if (updatedField === "password") {
         updatedValue = await bcryptjs.hash(updatedValue, 8);
+    }
+
+    if (updatedField === "email") {
+        const existingUser = await Users.findOne({ where: { email: req.body.value } });
+        if (existingUser !== null) {
+            res.status(403).send({ success: false, message: 'Email Taken' });
+            // Stop execution by using return or throwing an error
+            return;
+        }
     }
    
     await Users.update({ [updatedField]: updatedValue }, {
@@ -155,6 +165,8 @@ exports.update = async (req, res) => {
         .catch(err => {
             res.status(500).send({ success: false, message: err.message || 'Error Updating User' });
         })
+    
+    
 };
 
 // Delete a User with the specified id in the request
