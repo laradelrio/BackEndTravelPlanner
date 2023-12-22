@@ -44,7 +44,7 @@ exports.findAllTrips = (req, res) => {
 
 // Retrieve all Trips by USER from the database.
 exports.findAllTripsByUser = (req, res) => {
-    
+
     Trips.findAll({ where: { fk_users_id: req.params.id } })
         .then(data => {
             if (data.length === 0) {
@@ -76,6 +76,60 @@ exports.findOneTrip = (req, res) => {
         })
 
 };
+
+exports.findAllTripMatches = (req, res) => {
+    
+    const tripStartDate = req.body.startDate;
+    const tripEndDate = req.body.endDate;
+
+    Trips.findAll({
+        where: {
+            destination: req.body.destination,
+            [Op.and]: [
+                {
+                    [Op.or]: [
+                        { 
+                            [Op.and]: [
+                            {startDate: { [Op.lte]: tripStartDate }},
+                            {endDate: { [Op.gte]: tripStartDate } }
+                            ]
+                        },
+                        { 
+                            [Op.and]: [
+                                { 
+                                    [Op.and]:[
+                                    {
+                                        [Op.and]: [
+                                            {startDate: { [Op.gte]: tripStartDate }},
+                                            {startDate: { [Op.lte]: tripEndDate } }
+                                        ]
+                                    },
+                                    { endDate: {[Op.gte]: tripEndDate} }
+                                ]}
+                            ]
+                        },
+                        {
+                            [Op.and]: [
+                                {startDate: { [Op.gte]: tripStartDate }},
+                                {endDate: { [Op.lte]: tripEndDate } }
+                                ]  
+                        }
+                    ]
+                },
+                { fk_users_id: { [Op.ne]: req.params.id } },
+            ]
+        }})
+        .then(users => {
+            if (users.length === 0) {
+                res.status(200).send({ success: false, message: 'No Matches Found' });
+            } else {
+                res.status(200).send({ success: true, message: 'Matches Found Successfully', data: users});
+            }
+        })
+        .catch(err => {
+            res.status(500).send({ success: false, message: err.message || 'Error retrieving Matches' });
+        })
+}
 
 //update Trip
 exports.updateTrip = async (req, res) => {

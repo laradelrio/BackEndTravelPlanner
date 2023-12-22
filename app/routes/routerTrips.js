@@ -16,9 +16,18 @@ router.get('/' , controllers.findAllTrips);
 //get all trips by one user
 router.get('/user/:id' , controllers.findAllTripsByUser);
 
-//get Trip by ID
-router.get('/:id', controllers.findOneTrip)
 
+//get all users same place and time
+router.post('/matches/:id', controllers.findAllTripMatches);
+// router.get('/users-trip/:id', async(req, res)=>{
+//     let tripId = req.params.id;
+//     let response = await controllers.findAllUsersSameTripTime;
+//     res.send(response);
+// })
+
+
+//get Trip by ID
+router.get('/:id', controllers.findOneTrip);
 
 //POST
 router.post('/', validateDto(tripsDto.registerTrip), controllers.createTrip);
