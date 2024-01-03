@@ -4,10 +4,21 @@ const dbConfig = require("./config/db.config.js");
 
 const Sequelize = require("sequelize");
 
-const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER ,dbConfig.PASSWORD, {
+const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
     host: dbConfig.HOST,
     dialect: dbConfig.dialect,
-    operatorsAliases: 0, //boolean value is deprecated
+    operatorsAliases: 0,
+    dialectOptions: {
+        typeCast: function (field, next) {
+            if (field.type === 'DATETIME' || field.type === 'TIMESTAMP') {
+                const utcTimestamp = new Date(field.string() + 'Z');
+                const spainOffset = 1;
+                const spainTimestamp = new Date(utcTimestamp.getTime() + spainOffset * 60 * 60 * 1000);
+                return spainTimestamp;
+            }
+            return next();
+        }
+    },
     pool: {
         max: dbConfig.pool.max,
         min: dbConfig.pool.min,
