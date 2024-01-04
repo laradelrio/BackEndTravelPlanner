@@ -108,10 +108,30 @@ exports.findAllTripMatches = (req, res) => {
                                 ]}
                             ]
                         },
+                        { 
+                            [Op.and]: [
+                                { 
+                                    [Op.and]:[
+                                    {
+                                        [Op.and]: [
+                                            {startDate: { [Op.gte]: tripStartDate }},
+                                            {startDate: { [Op.lte]: tripEndDate } }
+                                        ]
+                                    },
+                                    { endDate: {[Op.lte]: tripEndDate} }
+                                ]}
+                            ]
+                        },
                         {
                             [Op.and]: [
                                 {startDate: { [Op.gte]: tripStartDate }},
                                 {endDate: { [Op.lte]: tripEndDate } }
+                                ]  
+                        },
+                        {
+                            [Op.and]: [
+                                {startDate: { [Op.lte]: tripStartDate }},
+                                {endDate: { [Op.gte]: tripEndDate } }
                                 ]  
                         }
                     ]

@@ -10,7 +10,7 @@ exports.createSight = async (req, res) => {
     const sight = {
         name: req.body.name,
         fk_trips_id: req.body.fk_trips_id,
-        longitude: req.body.longitude, 
+        longitude: req.body.longitude,
         latitude: req.body.latitude,
         startDate: req.body.startDate,
         endDate: req.body.endDate,
@@ -82,4 +82,36 @@ exports.deleteSight = async (req, res) => {
             res.status(500).send({ success: false, message: err.message || 'Error Deleting Sight' });
         })
 
+};
+
+exports.percentageSightMatch = async (req, res) => {
+    let trip1 = req.body.trip1
+    let trip2 = req.body.trip2
+
+    const sqlQuery = `
+    SELECT
+        (SUM(CASE WHEN sight_count = 2 THEN 1 ELSE 0 END) * 100) / COUNT(DISTINCT name) AS match_percentage
+    FROM (
+        SELECT
+            name,
+            COUNT(name) AS sight_count
+        FROM sights
+        WHERE fk_trips_id IN (?, ?)
+        GROUP BY name
+    ) AS sight_counts`;
+
+    try {
+        const [data] = await Sights.sequelize.query(sqlQuery, {
+            replacements: [trip1, trip2],
+            type: Sights.sequelize.QueryTypes.SELECT
+        });
+
+        if (!data || data.length === 0) {
+            res.status(404).send({ success: false, message: 'Sights Not Found' });
+        } else {
+            res.status(200).send({ success: true, message: 'Match Calculated Successfully', data: { matchPercentage: data.match_percentage } });
+        }
+    } catch (err) {
+        res.status(500).send({ success: false, message: err.message || 'Error Calculating Match' });
+    }
 };

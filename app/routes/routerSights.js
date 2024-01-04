@@ -11,8 +11,11 @@ router.get('/trip/:id', controllers.findAllSightsByTrip);
 
 router.post('/', validateDto(sightsDto.registerSight), controllers.createSight);
 
+router.post('/match', controllers.percentageSightMatch);
+
 router.put('/update/:id', controllers.updateSight);
 
 router.delete('/delete/:id', controllers.deleteSight);
+
 
 module.exports = router;
