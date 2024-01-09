@@ -11,10 +11,10 @@ module.exports = (sequelize, Sequelize) => {
             }
         },
         longitude: {
-            type: Sequelize.INTEGER
+            type: Sequelize.DECIMAL(8,5)
         },
         latitude: {
-            type: Sequelize.INTEGER
+            type: Sequelize.DECIMAL(8,5)
         },
         startDate: {
             type: Sequelize.DATE
