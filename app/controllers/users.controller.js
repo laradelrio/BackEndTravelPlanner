@@ -1,9 +1,11 @@
 const db = require("..");
 const Users = db.Users;
+const Trips = db.Trips;
 const Op = db.Sequelize.Op;
 const Sequelize = require("sequelize");
 const bcryptjs = require('bcryptjs');
 const tokenFunc = require('../helperFunctions/tokenFunctions');
+const tripsController = require('./trips.controller');
 
 
 // Create and Save a NEW User WITHOUT CHECKING IF THEIR EMAIL IS ALREADY REGISTERED
@@ -77,7 +79,7 @@ exports.findAll = (req, res) => {
 
 //find single User by id
 exports.findByPk = (req, res) => {
-    
+
     const id = req.params.id;
 
     Users.findByPk(id, { attributes: ['id', 'name', 'email', 'photo'] })
@@ -109,7 +111,7 @@ exports.findOne = async (req, res) => {
                     res.status(401).send({ success: false, message: 'Invalid Password' });
                 } else {
                     tokenFunc.createToken(data.id, res);
-                    res.status(200).send({ success: true, message: 'User Found Successfully by Email', data: { id: data.id, }});
+                    res.status(200).send({ success: true, message: 'User Found Successfully by Email', data: { id: data.id, } });
                 }
             }
         })
@@ -148,7 +150,7 @@ exports.update = async (req, res) => {
             return;
         }
     }
-    
+
     await Users.update({ [updatedField]: updatedValue }, {
         where: {
             id: userId,
@@ -164,13 +166,16 @@ exports.update = async (req, res) => {
         .catch(err => {
             res.status(500).send({ success: false, message: err.message || 'Error Updating User' });
         })
-    
-    
+
+
 };
 
 // Delete a User with the specified id in the request
 exports.delete = async (req, res) => {
     let userId = req.params.id;
+
+    await deleteTrips(userId, res)
+
     await Users.destroy({
         where: {
             id: userId,
@@ -188,6 +193,40 @@ exports.delete = async (req, res) => {
         })
 
 };
+
+function deleteTrips(userId, res) {
+    return new Promise(async (resolve, reject) => {
+        let trips = await getUserTrips(userId,res)
+        if(trips.length != 0){
+        
+        trips.forEach(async (trip) => {
+            tripsController.deleteSights(trip.id, res);
+            return await Trips.destroy({
+                where: {
+                    id: trip.id,
+                },  })
+                .then(data => { return data, resolve()})
+                .catch(err => {
+                    return res.status(500).send({ success: false, message: err.message || 'Error Deleting User TripSights'}, resolve());
+                })
+                
+            })
+        } else{
+            resolve();
+        }
+    })
+}
+
+
+function getUserTrips(userId, res){ 
+    return new Promise(async (resolve, rej) => {
+    await Trips.findAll({ where: { fk_users_id: userId } })
+        .then(data => { resolve(data)  })
+        .catch(err => {
+            resolve(res.status(500).send({ success: false, message: err.message || 'Error Deleting User Trips' }));
+        })
+})
+}
 
 // Delete all Users from the database.
 exports.deleteAll = (req, res) => {
