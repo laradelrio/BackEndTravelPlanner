@@ -206,11 +206,7 @@ function deleteSights(tripId, res){
             },
         })
             .then(data => {
-                if (data === 0) {
-                    resolve(res.status(404).send({ success: false, message: 'Sight Not Found' }));
-                } else {
                     resolve();
-                }
             })
             .catch(err => {
                 resolve(res.status(500).send({ success: false, message: err.message || 'Error Deleting Trip and Sights' }));
