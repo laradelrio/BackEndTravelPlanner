@@ -4,6 +4,7 @@ const Sights = db.Sights;
 const Op = db.Sequelize.Op;
 const Sequelize = require("sequelize");
 const dotenv = require('dotenv');
+const sightsController = require('./sights.controller');
 
 // Create and Save a NEW Trip
 exports.createTrip = async (req, res) => {
@@ -178,7 +179,7 @@ exports.updateTrip = async (req, res) => {
 //delete Trip by ID
 exports.deleteTrip = async (req, res) => {
     let tripId = req.params.id;
-    await deleteSights(tripId, res);
+    await sightsController.deleteSights(tripId, res);
     await Trips.destroy({
         where: {
             id: tripId,
@@ -197,19 +198,5 @@ exports.deleteTrip = async (req, res) => {
 
 };
 
-exports.deleteSights = (tripId, res) =>{ 
-    return new Promise (async (resolve, reject) => {
-        await Sights.destroy({
-            where: {
-                fk_trips_id: tripId,
-            },
-        })
-            .then(data => {
-                    resolve();
-            })
-            .catch(err => {
-                resolve(res.status(500).send({ success: false, message: err.message || 'Error Deleting Trip and Sights' }));
-            })
-    })
-}
+
 

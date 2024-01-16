@@ -115,3 +115,20 @@ exports.percentageSightMatch = async (req, res) => {
         res.status(500).send({ success: false, message: err.message || 'Error Calculating Match' });
     }
 };
+
+//delete all the sights in one trip
+exports.deleteSights = (tripId, res) =>{ 
+    return new Promise (async (resolve, reject) => {
+        await Sights.destroy({
+            where: {
+                fk_trips_id: tripId,
+            },
+        })
+            .then(data => {
+                    resolve();
+            })
+            .catch(err => {
+                resolve(res.status(500).send({ success: false, message: err.message || 'Error Deleting Trip and Sights' }));
+            })
+    })
+}

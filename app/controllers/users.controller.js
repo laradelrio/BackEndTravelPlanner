@@ -5,7 +5,7 @@ const Op = db.Sequelize.Op;
 const Sequelize = require("sequelize");
 const bcryptjs = require('bcryptjs');
 const tokenFunc = require('../helperFunctions/tokenFunctions');
-const tripsController = require('./trips.controller');
+const sightsController = require('./sights.controller');
 
 
 // Create and Save a NEW User WITHOUT CHECKING IF THEIR EMAIL IS ALREADY REGISTERED
@@ -200,7 +200,7 @@ function deleteTrips(userId, res) {
         if(trips.length != 0){
         
         trips.forEach(async (trip) => {
-            tripsController.deleteSights(trip.id, res);
+            sightsController.deleteSights(trip.id, res);
             return await Trips.destroy({
                 where: {
                     id: trip.id,
