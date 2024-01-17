@@ -6,6 +6,9 @@ const Sequelize = require("sequelize");
 const bcryptjs = require('bcryptjs');
 const tokenFunc = require('../helperFunctions/tokenFunctions');
 const sightsController = require('./sights.controller');
+const dotenv = require('dotenv');
+const sgMail = require('@sendgrid/mail');
+const { urlencoded } = require("express");
 
 
 // Create and Save a NEW User WITHOUT CHECKING IF THEIR EMAIL IS ALREADY REGISTERED
@@ -196,44 +199,132 @@ exports.delete = async (req, res) => {
 
 function deleteTrips(userId, res) {
     return new Promise(async (resolve, reject) => {
-        let trips = await getUserTrips(userId,res)
-        if(trips.length != 0){
-        
-        trips.forEach(async (trip) => {
-            sightsController.deleteSights(trip.id, res);
-            return await Trips.destroy({
-                where: {
-                    id: trip.id,
-                },  })
-                .then(data => { return data, resolve()})
-                .catch(err => {
-                    return res.status(500).send({ success: false, message: err.message || 'Error Deleting User TripSights'}, resolve());
+        let trips = await getUserTrips(userId, res)
+        if (trips.length != 0) {
+
+            trips.forEach(async (trip) => {
+                sightsController.deleteSights(trip.id, res);
+                return await Trips.destroy({
+                    where: {
+                        id: trip.id,
+                    },
                 })
-                
+                    .then(data => { return data, resolve() })
+                    .catch(err => {
+                        return res.status(500).send({ success: false, message: err.message || 'Error Deleting User TripSights' }, resolve());
+                    })
+
             })
-        } else{
+        } else {
             resolve();
         }
     })
 }
 
-
-function getUserTrips(userId, res){ 
-    return new Promise(async (resolve, rej) => {
-    await Trips.findAll({ where: { fk_users_id: userId } })
-        .then(data => { resolve(data)  })
-        .catch(err => {
-            resolve(res.status(500).send({ success: false, message: err.message || 'Error Deleting User Trips' }));
-        })
-})
+function getUserTrips(userId, res) {
+    return new Promise(async (resolve, reject) => {
+        await Trips.findAll({ where: { fk_users_id: userId } })
+            .then(data => { resolve(data) })
+            .catch(err => {
+                resolve(res.status(500).send({ success: false, message: err.message || 'Error Deleting User Trips' }));
+            })
+    })
 }
 
-// Delete all Users from the database.
-exports.deleteAll = (req, res) => {
-
+exports.isEmailRegistered = (req, res) => {
+    Users.findOne({ where: { email: req.body.email } })
+        .then(async data => {
+            if (data === null) {
+                res.status(200).send({ success: true, message: 'Email register check successful', data: { emailRegistered: false } });
+            } else {
+                res.status(200).send({ success: true, message: 'Email register check successful', data: { emailRegistered: true } });
+            }
+        })
+        .catch(err => {
+            res.status(500).send({ success: false, message: err.message || 'Error checking if email is registered' });
+        })
 };
 
-// Find all published Users
-exports.findAllPublished = (req, res) => {
+//send reset password email
+exports.sendResetPasswordEmail = async (req, res) => {
+    console.log('IN SEND EMAIL FUNC')
+    let email = req.body.email;
+    let user = await getUserNameId(email, res);
+    let hashedUserId = await bcryptjs.hash((user.id).toString(), 8);
+    let encodedHash = encodeURIComponent(hashedUserId);
+    console.log(encodedHash);
+    let url = `https://travel-mates.vercel.app/password/reset/${encodedHash}`;
 
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY)
+    const msg = {
+        to: email, // Change to your recipient
+        from: process.env.SENDER_EMAIL, // Change to your verified sender
+        subject: 'Reset your Travel Mates Password',
+        text: 're',
+        html: `<p> Dear ${user.name}, </p> <br>
+
+            <p> To reset your password, click on the following link: 
+                <a href='https://travel-mates.vercel.app/password/reset/${encodedHash}'> Reset Password  </a>
+                <a href='${url}'> Reset Password 2  </a>
+            </p>
+            <p>If you didn't request this, please disregard.</p> <br>
+
+            <p>Best, </p>
+            <p>Travel Mates</p>`,
+    }
+
+    sgMail
+        .send(msg)
+        .then(() => {
+            console.log('Email sent')
+        })
+        .catch((error) => {
+            console.error(error)
+        })
 };
+
+function getUserNameId(email, res) {
+    return new Promise(async (resolve, reject) => {
+        Users.findOne({ where: { email: email } }, { attributes: ['id', 'name'] })
+            .then(async data => {
+                console.log('here')
+                resolve({ name: data.name, id: data.id });
+            })
+            .catch(err => {
+                console.log('here3', email)
+                res.status(500).send({ success: false, message: err.message || 'Error' });
+            })
+    })
+}
+
+exports.updatePassword = async (req, res) => {
+    console.log('here', req.body.email)
+    let user = await getUserNameId(req.body.email, res);
+    console.log(user)
+    let sameUserId = await bcryptjs.compare((user.id).toString(), req.body.encryptedUserId);
+    console.log(sameUserId)
+    if (!sameUserId) {
+        res.status(204).send({ success: false, message: 'Email not associated to this account' });
+    } else {
+        if (req.body.password !== req.body.passwordConfirmed) {
+            res.status(204).send({ success: false, message: 'Passwords are different' });
+        } else {
+            let newHashedPassword = await bcryptjs.hash(req.body.password, 8);
+            await Users.update({ ['password']: newHashedPassword }, {
+                where: {
+                    email: req.body.email,
+                },
+            })
+                .then(data => {
+                    if (data[0] === 0) {
+                        res.status(204).send({ success: false, message: 'User Not Found' });
+                    } else {
+                        res.status(200).send({ success: true, message: 'Password updated successfully' });
+                    }
+                })
+                .catch(err => {
+                    res.status(500).send({ success: false, message: err.message || 'Error Updating Password' });
+                })
+        }
+    }
+}
