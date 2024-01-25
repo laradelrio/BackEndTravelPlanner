@@ -44,7 +44,7 @@ function createToken(userId, res) {
     const serialized = cookie.serialize('token', token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict', //prevents the cookie from being sent with cross-site requests
+        sameSite: 'none', //prevents the cookie from being sent with cross-site requests
         maxAge: 60 * 60 * 24 * 30,  // sets the maximum age of the cookie in seconds. here: 30 days
         path: '/', // cookie is valid for the entire website
     });
@@ -56,7 +56,7 @@ function logout(res) {
     const serialized = cookie.serialize('token', null, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
+        sameSite: 'none',
         maxAge: -1,
         path: '/',
     });
