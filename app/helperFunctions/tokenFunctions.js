@@ -14,7 +14,6 @@ function validateToken(req, res) {
         const verified = jwt.verify(token, secretJWT, (err, decoded) => {
             if (err) {
                 logout(res)
-                res.status(500).send({ success: false, message: 'Unauthorized' });
             } else {
                 checkTokenExpiry(token, decoded.id_user, res)
                 return
@@ -61,8 +60,8 @@ function logout(res) {
         maxAge: -1,
         path: '/',
     });
-
-    return res.setHeader('Set-Cookie', serialized);
+    res.setHeader('Set-Cookie', serialized);
+    res.status(500).send({ success: false, message: 'Unauthorized' });
 }
 
 
