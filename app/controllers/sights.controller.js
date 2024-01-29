@@ -31,7 +31,7 @@ exports.findAllSightsByTrip = (req, res) => {
     Sights.findAll({ where: { fk_trips_id: req.params.id } })
         .then(data => {
             if (data.length === 0) {
-                res.status(404).send({ success: false, message: 'No Sights Found' });
+                res.status(200).send({ success: false, message: 'No Sights Found' });
             } else {
                 res.status(200).send({ success: true, message: 'Sights Found Successfully', data: data });
             }
