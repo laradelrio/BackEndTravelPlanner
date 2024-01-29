@@ -247,12 +247,10 @@ exports.isEmailRegistered = (req, res) => {
 
 //send reset password email
 exports.sendResetPasswordEmail = async (req, res) => {
-    console.log('IN SEND EMAIL FUNC')
     let email = req.body.email;
     let user = await getUserNameId(email, res);
     let hashedUserId = await bcryptjs.hash((user.id).toString(), 8);
     let encodedHash = encodeURIComponent(hashedUserId);
-    console.log(encodedHash);
     let url = `https://travel-mates.vercel.app/password/reset/${encodedHash}`;
 
     sgMail.setApiKey(process.env.SENDGRID_API_KEY)
@@ -264,8 +262,7 @@ exports.sendResetPasswordEmail = async (req, res) => {
         html: `<p> Dear ${user.name}, </p> <br>
 
             <p> To reset your password, click on the following link: 
-                <a href='https://travel-mates.vercel.app/password/reset/${encodedHash}'> Reset Password  </a>
-                <a href='${url}'> Reset Password 2  </a>
+                <a href='https://travel-mates.vercel.app/password/reset/${encodedHash}'> Reset Password </a>
             </p>
             <p>If you didn't request this, please disregard.</p> <br>
 
@@ -287,22 +284,19 @@ function getUserNameId(email, res) {
     return new Promise(async (resolve, reject) => {
         Users.findOne({ where: { email: email } }, { attributes: ['id', 'name'] })
             .then(async data => {
-                console.log('here')
                 resolve({ name: data.name, id: data.id });
             })
             .catch(err => {
-                console.log('here3', email)
                 res.status(500).send({ success: false, message: err.message || 'Error' });
             })
     })
 }
 
 exports.updatePassword = async (req, res) => {
-    console.log('here', req.body.email)
+
     let user = await getUserNameId(req.body.email, res);
-    console.log(user)
     let sameUserId = await bcryptjs.compare((user.id).toString(), req.body.encryptedUserId);
-    console.log(sameUserId)
+    
     if (!sameUserId) {
         res.status(204).send({ success: false, message: 'Email not associated to this account' });
     } else {
