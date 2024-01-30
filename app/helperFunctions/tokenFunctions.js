@@ -61,7 +61,8 @@ function logout(res) {
         path: '/',
     });
     res.setHeader('Set-Cookie', serialized);
-    res.status(500).send({ success: false, message: 'Unauthorized' });
+    res.status(200).send({ success: false, message: 'Unauthorized' });
+    return  res.send( 401 );
 }
 
 
