@@ -9,7 +9,7 @@ const cookieParser = require("cookie-parser");
 const app = express();
 
 var corsOptions = {
-    origin: "https://travel-mates.vercel.app",
+    origin: "https://travel-mates.vercel.app/",
     credentials: true,
 };
 
